@@ -7,10 +7,6 @@
             var URL = "https://4acu5lnuoc.execute-api.eu-west-3.amazonaws.com/dev";
      
                  var Namere = /[A-Za-z]{1}[A-Za-z]/;
-                 if (!Namere.test($("#name-input").val())) {
-                              alert ("Name can not less than 2 char");
-                     return;
-                 }
                  var mobilere = /[0-9]{10}/;
                  if (!mobilere.test($("#phone-input").val())) {
                      alert ("Please enter valid mobile number");
