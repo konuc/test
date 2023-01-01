@@ -189,18 +189,18 @@
             <div class="row justify-content-center">
                 <div class="col-lg-8 col-xl-7">
                     <div>
-                        <form>
-                            <label for="name">Name:</label>
-                            <input name="name" type="text" /><br /><br />
-                            <label for="email">Email:</label>
-                            <input name="email" type="email" /><br /><br />
-                            <label for="name">Message:</label>
-                            <textarea name="message"></textarea><br /><br />
-                            <input type="submit" />
-                            <div>
-                                <p id="result-text"></p>
-                            </div>
-                        </form>
+                        <form id="contact-form" method="post">
+                            <h4>Name:</h4>
+                            <input type="text" style="height:35px;" id="name-input" placeholder="Enter name here…" class="form-control" style="width:100%;" /><br/>
+                            <h4>Phone:</h4>
+                            <input type="phone" style="height:35px;" id="phone-input" placeholder="Enter phone number" class="form-control" style="width:100%;"/><br/>
+                            <h4>Email:</h4>
+                            <input type="email" style="height:35px;" id="email-input" placeholder="Enter email here…" class="form-control" style="width:100%;"/><br/>
+                            <h4>How can we help you?</h4>
+                            <textarea id="description-input" rows="3" placeholder="Enter your message…" class="form-control" style="width:100%;"></textarea><br/>
+                            <div class="g-recaptcha" data-sitekey="6Lc7cVMUAAAAAM1yxf64wrmO8gvi8A1oQ_ead1ys" class="form-control" style="width:100%;"></div>
+                            <button type="button" onClick="submitToAPI(event)" class="btn btn-lg" style="margin-top:20px;">Submit</button>
+                      </form>
                     </div>
                 </div>
             </div>
@@ -479,41 +479,62 @@
     <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *-->
     <script src="https://cdn.startbootstrap.com/sb-forms-latest.js"></script>
     <script>
-        const form = document.querySelector("form");
-        form.addEventListener("submit", (event) => {
-            // prevent the form submit from refreshing the page
-            event.preventDefault();
+        function submitToAPI(e) {
+       e.preventDefault();
+       var URL = "https://abc1234.execute-api.us-east-1.amazonaws.com/01/contact";
 
-            const { name, email, message } = event.target;
+            var Namere = /[A-Za-z]{1}[A-Za-z]/;
+            if (!Namere.test($("#name-input").val())) {
+                         alert ("Name can not less than 2 char");
+                return;
+            }
+            var mobilere = /[0-9]{10}/;
+            if (!mobilere.test($("#phone-input").val())) {
+                alert ("Please enter valid mobile number");
+                return;
+            }
+            if ($("#email-input").val()=="") {
+                alert ("Please enter your email id");
+                return;
+            }
 
-            // Use your API endpoint URL you copied from the previous step
-            const endpoint =
-                "https://wcgpz54ugi.execute-api.eu-west-3.amazonaws.com/testApi/sendEmail3";
-            // We use JSON.stringify here so the data can be sent as a string via HTTP
-            const body = JSON.stringify({
-                senderName: name.value,
-                senderEmail: email.value,
-                message: message.value
-            });
-            const requestOptions = {
-                method: "POST",
-                body
-            };
+            var reeamil = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,6})?$/;
+            if (!reeamil.test($("#email-input").val())) {
+                alert ("Please enter valid email address");
+                return;
+            }
 
-            fetch(endpoint, requestOptions)
-                .then((response) => {
-                    if (!response.ok) throw new Error("Error in fetch");
-                    return response.json();
-                })
-                .then((response) => {
-                    document.getElementById("result-text").innerText =
-                        "Email sent successfully!";
-                })
-                .catch((error) => {
-                    document.getElementById("result-text").innerText =
-                        "An unkown error occured.";
-                });
-        });
+       var name = $("#name-input").val();
+       var phone = $("#phone-input").val();
+       var email = $("#email-input").val();
+       var desc = $("#description-input").val();
+       var data = {
+          name : name,
+          phone : phone,
+          email : email,
+          desc : desc
+        };
+
+       $.ajax({
+         type: "POST",
+         url : "https://8n4j6uyod9.execute-api.eu-west-3.amazonaws.com/dev/mail-fwd",
+         dataType: "json",
+         crossDomain: "true",
+         contentType: "application/json; charset=utf-8",
+         data: JSON.stringify(data),
+
+         
+         success: function () {
+           // clear form and show a success message
+           alert("Successfull");
+           document.getElementById("contact-form").reset();
+       location.reload();
+         },
+         error: function () {
+           // show an error message
+           alert("UnSuccessfull");
+         }});
+     }
     </script>
 </body>
 
